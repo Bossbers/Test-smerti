@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Голосование за единство братских народов</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('https://i.imgur.com/zYVfzJo.jpg') fixed;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(to right, #0057b7 40%, #ffd700 60%);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .president-img {
+            width: 160px;
+            height: 120px;
+            border: 3px solid #daa520;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #fff;
+            padding: 2px;
+            transition: transform 0.3s;
+        }
+
+        .president-img:hover {
+            transform: scale(1.03);
+        }
+
+        .vote-buttons {
+            margin: 40px auto;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vote-btn {
+            width: 280px;
+            height: 180px;
+            font-size: 36px;
+            border: 4px solid #2c2c2c;
+            border-radius: 15px;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .vote-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        #yes-btn {
+            background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), 
+                            url('https://i.imgur.com/5u4Wz9v.png');
+        }
+
+        #no-btn {
+            background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), 
+                            url('https://i.imgur.com/1H2TvxW.png');
+        }
+
+        .results {
+            font-size: 24px;
+            margin: 30px;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .music-player {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://i.imgur.com/9zQ4b8x.webp" 
+             alt="Президент РФ" class="president-img">
+        <img src="https://i.imgur.com/5sX8K2v.webp" 
+             alt="Президент Украины" class="president-img">
+    </header>
+
+    <div class="music-player">
+        <audio id="bgMusic" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2023/03/23/audio_3d40b5d2b3.mp3" type="audio/mpeg">
+        </audio>
+        <button onclick="toggleMusic()" style="padding: 8px 15px; border-radius:15px; cursor:pointer;">♪ Звук</button>
+    </div>
+
+    <div class="vote-buttons">
+        <button id="yes-btn" class="vote-btn" onclick="vote(true)">ДА</button>
+        <button id="no-btn" class="vote-btn" onclick="vote(false)">НЕТ</button>
+    </div>
+
+    <div class="results">
+        <h2 style="margin:0 0 15px 0;">Результаты:</h2>
+        <p>Да: <span id="yes-count">0</span></p>
+        <p>Нет: <span id="no-count">0</span></p>
+    </div>
+
+    <script>
+        // Инициализация хранилища
+        let votes = {
+            yes: parseInt(localStorage.getItem('yesVotes')) || 0,
+            no: parseInt(localStorage.getItem('noVotes')) || 0
+        };
+
+        // Музыкальное управление
+        const music = document.getElementById('bgMusic');
+        music.volume = 0.3;
+
+        function toggleMusic() {
+            music.paused ? music.play() : music.pause();
+            document.querySelector('.music-player button').textContent = 
+                music.paused ? '♪ Вкл. звук' : '♪ Выкл. звук';
+        }
+
+        // Система голосования
+        function vote(isYes) {
+            if(localStorage.getItem('voted')) {
+                alert('Вы уже проголосовали!');
+                if(navigator.vibrate) navigator.vibrate([100,50,100]);
+                return;
+            }
+
+            const btn = document.getElementById(isYes ? 'yes-btn' : 'no-btn');
+            btn.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                if(isYes) votes.yes++;
+                else votes.no++;
+                
+                localStorage.setItem('yesVotes', votes.yes);
+                localStorage.setItem('noVotes', votes.no);
+                localStorage.setItem('voted', 'true');
+                
+                updateResults();
+                btn.style.transform = '';
+            }, 200);
+        }
+
+        function updateResults() {
+            document.getElementById('yes-count').textContent = votes.yes;
+            document.getElementById('no-count').textContent = votes.no;
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            updateResults();
+            document.addEventListener('click', function initMusic() {
+                try { music.play(); } catch(e) {}
+                document.removeEventListener('click', initMusic);
+            });
+        });
+    </script>
+</body>
+</html>
