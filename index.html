@@ -50,6 +50,7 @@
             text-shadow: 2px 2px 4px black;
             color: white;
             transition: transform 0.3s;
+            text-align: center;
         }
 
         .vote-btn:hover {
@@ -93,13 +94,14 @@
         <p>Нет: <span id="no-count">0</span></p>
     </div>
 
-    <iframe width="0" height="0" src="https://www.youtube.com/embed/2X9QGY__0II?autoplay=1&loop=1&mute=1" 
+    <!-- Фоновая музыка из YouTube -->
+    <iframe width="1" height="1" src="https://www.youtube.com/embed/2X9QGY__0II?autoplay=1&loop=1&mute=1" 
             frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
     <script>
         let votes = {
-            yes: localStorage.getItem('yesVotes') || 0,
-            no: localStorage.getItem('noVotes') || 0
+            yes: parseInt(localStorage.getItem('yesVotes')) || 0,
+            no: parseInt(localStorage.getItem('noVotes')) || 0
         };
 
         function updateResults() {
